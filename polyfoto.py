@@ -143,7 +143,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-n", required=True,
-        help="Number of rows", type=float
+        help="Number of rows", type=int
     )
     parser.add_argument(
         "-p", nargs="?", default=0.5,
@@ -151,11 +151,11 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-s", nargs="?", default=4,
-        help="Rescaling factor", type=float
+        help="Rescaling factor", type=int
     )
     parser.add_argument(
         "-t", nargs="?", default=16,
-        help="Pixel height of thumbnails", type=float
+        help="Pixel height of thumbnails", type=int
     )
     parser.add_argument(
         "-x", nargs="?", default="tmp",
