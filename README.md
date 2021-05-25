@@ -4,7 +4,8 @@ Create image mosaics.
 
 ## Installation
 
-Clone this repository to your local machine, then install using Python.
+Clone this repository to your local machine with git, then install using
+Python.
 
 ```bash
 git clone https://github.com/shanedrabing/polyfoto.git
@@ -14,16 +15,16 @@ python setup.py install
 
 ## Getting Started
 
+```bash
+python polyfoto.py -f input.png -d sources -o output.png -n 16
+```
+
 Required arguments include:
 
 - `-f` : Input file name. Image to recreate.
 - `-d` : Input folder name. Contains images used to recreate the input file.
 - `-o` : Output file name. Name of the rendered canvas.
 - `-n` : Number of rows. How many rows of images used in recreation.
-
-```bash
-python polyfoto.py -f input.png -d sources -o output.png -n 16
-```
 
 ## Optional arguments
 
