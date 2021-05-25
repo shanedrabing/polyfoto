@@ -1,3 +1,8 @@
+__author__ = "Shane Drabing"
+__license__ = "MIT"
+__version__ = "0.0.1"
+__email__ = "shane.drabing@gmail.com"
+
 import os
 import sys
 
