@@ -147,7 +147,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-p", nargs="?", default=0.5,
-        help="Center of construction", type=float
+        help="Proportional center of construction", type=float
     )
     parser.add_argument(
         "-s", nargs="?", default=4,
