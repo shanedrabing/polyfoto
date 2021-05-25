@@ -1,0 +1,2 @@
+# polyfoto
+Create image mosaics
