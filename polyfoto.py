@@ -111,11 +111,11 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
 
             print(f"{len(thumbs)} / {len_all_thumbs}".ljust(30), end="\r")
 
-        cv2.imshow("Main", cv2.cvtColor(
-            resize_landscape(cnv, 720), cv2.COLOR_RGB2BGR))
-        k = cv2.waitKey(1)
-        if k == ord("q"):
-            sys.exit(1)
+        # cv2.imshow("Main", cv2.cvtColor(
+        #     resize_landscape(cnv, 720), cv2.COLOR_RGB2BGR))
+        # k = cv2.waitKey(1)
+        # if k == ord("q"):
+        #     sys.exit(1)
 
     return cnv
 
