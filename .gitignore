@@ -131,3 +131,4 @@ dmypy.json
 # Other
 test_script.py
 tmp
+render

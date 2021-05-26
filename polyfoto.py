@@ -49,17 +49,20 @@ def convert_or_load(FOLDER_SRC, THUMBSIZE):
         path_src = os.path.realpath(os.path.join(FOLDER_SRC, name))
         path_tmp = os.path.realpath(os.path.join(FOLDER_TMP, name))
 
-        if os.path.exists(path_tmp):
-            im = imageio.imread(path_tmp)
-        else:
-            im = imageio.imread(path_src)
-            im = resize_landscape(im, THUMBSIZE)
-            if im.shape[-1] != 3:
-                print(im.shape)
-                sys.exit(0)
-            imageio.imwrite(path_tmp, im)
+        try:
+            if os.path.exists(path_tmp):
+                im = imageio.imread(path_tmp)
+            else:
+                im = imageio.imread(path_src)
+                im = resize_landscape(im, THUMBSIZE)
+                if im.shape[-1] != 3:
+                    print(im.shape)
+                    sys.exit(0)
+                imageio.imwrite(path_tmp, im)
 
-        thumbs.append((name, im.astype(np.int16)))
+            thumbs.append((name, im.astype(np.int16)))
+        except ValueError:
+            pass
     return thumbs
 
 
@@ -109,7 +112,7 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
             cnv[ha:hb, xa:xb] = im[:, :prt.shape[1]]
             xa = xb
 
-            print(f"{len(thumbs)} / {len_all_thumbs}".ljust(30), end="\r")
+            print(f"{len(thumbs)} / {len_all_thumbs} remain".ljust(30), end="\r")
 
         # cv2.imshow("Main", cv2.cvtColor(
         #     resize_landscape(cnv, 720), cv2.COLOR_RGB2BGR))
@@ -117,6 +120,7 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
         # if k == ord("q"):
         #     sys.exit(1)
 
+    print(f"{len(thumbs)} / {len_all_thumbs} remain".ljust(30))
     return cnv
 
 
