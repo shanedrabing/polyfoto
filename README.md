@@ -4,7 +4,7 @@ Create image mosaics.
 
 *"Scott 3" by Scott Walker.*|*"Before and After Science" by Brian Eno.*
 -|-
-![docs/scott3_mosaic.jpg](docs/scott3_mosaic.jpg)|![docs/bna_science_mosaic.jpg](docs/bna_science_mosaic.jpg)
+![docs/scott3_mosaic.jpg](docs/scott3_mosaic.jpg){:class="img-responsive"}|![docs/bna_science_mosaic.jpg](docs/bna_science_mosaic.jpg){:class="img-responsive"}
 
 ## Installation
 
