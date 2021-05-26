@@ -4,10 +4,8 @@ __version__ = "0.1.1"
 __email__ = "shane.drabing@gmail.com"
 
 import os
-import sys
 
 import cv2
-import imageio
 import numpy as np
 
 
@@ -24,11 +22,11 @@ def prod(itr):
     return n
 
 
-def torgb(im):
+def to_bgr(im):
     if len(im.shape) == 2:
-        im = cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
+        im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
     elif im.shape[2] == 4:
-        im = cv2.cvtColor(im, cv2.COLOR_RGBA2RGB)
+        im = cv2.cvtColor(im, cv2.COLOR_BGRA2BGR)
     return im
 
 
@@ -37,7 +35,7 @@ def resize_landscape(im, h):
     ratio = h / imh
     w = round(ratio * imw)
     reim = cv2.resize(im, (w, h))
-    reim = torgb(reim)
+    reim = to_bgr(reim)
     return reim
 
 
@@ -54,24 +52,21 @@ def convert_or_load(FOLDER_SRC, THUMBSIZE):
 
         try:
             if os.path.exists(path_tmp):
-                im = imageio.imread(path_tmp)
+                im = cv2.imread(path_tmp)
             else:
-                im = imageio.imread(path_src)
+                im = cv2.imread(path_src)
                 im = resize_landscape(im, THUMBSIZE)
-                if im.shape[-1] != 3:
-                    print(im.shape)
-                    sys.exit(0)
-                imageio.imwrite(path_tmp, im)
+                cv2.imwrite(path_tmp, im)
 
-            thumbs.append((name, im.astype(np.int16)))
+            if im is not None:
+                thumbs.append((name, im.astype(np.int16)))
         except ValueError:
             pass
     return thumbs
 
 
 def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
-
-    cnv = torgb(imageio.imread(FILE_IN))
+    cnv = to_bgr(cv2.imread(FILE_IN))
     cnvh, cnvw, *_ = cnv.shape
     cnv = cv2.resize(cnv, (cnvw * RESCALE, cnvh * RESCALE))
     cnvh, cnvw, *_ = cnv.shape
@@ -111,7 +106,7 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
 
             path_src = os.path.join(FOLDER_SRC, name)
 
-            im = imageio.imread(path_src)
+            im = cv2.imread(path_src)
             im = resize_landscape(im, row.shape[0])
 
             xb = xa + im.shape[1]
@@ -205,8 +200,7 @@ if __name__ == "__main__":
     # save the canvas
     print("SAVING".ljust(30))
 
-    cv2.imwrite(FILE_OUT, cv2.cvtColor(cnv, cv2.COLOR_RGB2BGR))
-    # imageio.imwrite(FILE_OUT, cnv)
+    cv2.imwrite(FILE_OUT, cnv)
 
     # all done
     print("DONE :)".ljust(30))
