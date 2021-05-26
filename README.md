@@ -2,9 +2,9 @@
 
 Create image mosaics.
 
-![docs/scott3_mosaic.jpg](docs/scott3_mosaic.jpg)
-
-*Album art recreation of "Scott 3" by Scott Walker.*
+*"Scott 3" by Scott Walker.*|*"Before and After Science" by Brian Eno.*
+-|-
+![docs/scott3_mosaic.jpg](docs/scott3_mosaic.jpg)|![docs/bna_science_mosaic.jpg](docs/bna_science_mosaic.jpg)
 
 ## Installation
 
