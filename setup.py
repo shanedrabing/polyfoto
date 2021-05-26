@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="polyfoto",
-    version="0.1.1",
+    version="0.2.0",
     author="Shane Drabing",
     author_email="shane.drabing@gmail.com",
     packages=setuptools.find_packages(),
@@ -21,6 +21,6 @@ setuptools.setup(
         ("", ["LICENSE.txt"])
     ],
     install_requires=[
-        "cv2", "imageio", "numpy"
+        "cv2", "numpy"
     ]
 )
