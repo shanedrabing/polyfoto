@@ -24,17 +24,20 @@ def prod(itr):
     return n
 
 
+def torgb(im):
+    if len(im.shape) == 2:
+        im = cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
+    elif im.shape[2] == 4:
+        im = cv2.cvtColor(im, cv2.COLOR_RGBA2RGB)
+    return im
+
+
 def resize_landscape(im, h):
     imh, imw, *_ = im.shape
     ratio = h / imh
     w = round(ratio * imw)
     reim = cv2.resize(im, (w, h))
-
-    if len(im.shape) == 2:
-        reim = cv2.cvtColor(reim, cv2.COLOR_GRAY2RGB)
-    elif im.shape[2] == 4:
-        reim = cv2.cvtColor(reim, cv2.COLOR_RGBA2RGB)
-
+    reim = torgb(reim)
     return reim
 
 
@@ -67,7 +70,8 @@ def convert_or_load(FOLDER_SRC, THUMBSIZE):
 
 
 def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
-    cnv = imageio.imread(FILE_IN)
+
+    cnv = torgb(imageio.imread(FILE_IN))
     cnvh, cnvw, *_ = cnv.shape
     cnv = cv2.resize(cnv, (cnvw * RESCALE, cnvh * RESCALE))
     cnvh, cnvw, *_ = cnv.shape
@@ -77,7 +81,10 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
     v = u + rowh
     slices = enumerate(zip(map(round, u), map(round, v)))
 
-    for rowi, (ha, hb) in sorted(slices, key=srt(ROW_PROP)):
+    len_slices = len(u)
+    len_thumbs = len(thumbs)
+
+    for rowi, (_, (ha, hb)) in enumerate(sorted(slices, key=srt(ROW_PROP))):
         xa = 0
         row = cnv[ha:hb, :]
         tmp = resize_landscape(row, THUMBSIZE)
@@ -112,7 +119,7 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
             cnv[ha:hb, xa:xb] = im[:, :prt.shape[1]]
             xa = xb
 
-            print(f"{len(thumbs)} / {len_all_thumbs} remain".ljust(30), end="\r")
+            print(f"{len(thumbs)} / {len_thumbs} images, {rowi} / {len_slices} rows".ljust(40), end="\r")
 
         # cv2.imshow("Main", cv2.cvtColor(
         #     resize_landscape(cnv, 720), cv2.COLOR_RGB2BGR))
@@ -120,7 +127,7 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
         # if k == ord("q"):
         #     sys.exit(1)
 
-    print(f"{len(thumbs)} / {len_all_thumbs} remain".ljust(30))
+    print(f"{len(thumbs)} / {len_thumbs} images".ljust(40))
     return cnv
 
 
@@ -187,7 +194,6 @@ if __name__ == "__main__":
     print("CONVERTING / LOADING")
 
     thumbs = convert_or_load(FOLDER_SRC, THUMBSIZE)
-    len_all_thumbs = len(thumbs)
 
     # make mosaic
     print("BUILDING".ljust(30))
@@ -199,7 +205,8 @@ if __name__ == "__main__":
     # save the canvas
     print("SAVING".ljust(30))
 
-    imageio.imwrite(FILE_OUT, cnv)
+    cv2.imwrite(FILE_OUT, cv2.cvtColor(cnv, cv2.COLOR_RGB2BGR))
+    # imageio.imwrite(FILE_OUT, cnv)
 
     # all done
     print("DONE :)".ljust(30))

@@ -2,6 +2,10 @@
 
 Create image mosaics.
 
+![docs/scott3_mosaic.jpg](docs/scott3_mosaic.jpg)
+
+*Album art recreation of "Scott 3" by Scott Walker.*
+
 ## Installation
 
 Clone this repository to your local machine with git, then install using
