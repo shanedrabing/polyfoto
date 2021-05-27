@@ -21,7 +21,7 @@ python setup.py install
 
 ## Getting Started
 
-Te bare minimum:
+The bare minimum:
 
 ```bash
 python polyfoto.py -f input.png -d sources -o output.png -n 16
