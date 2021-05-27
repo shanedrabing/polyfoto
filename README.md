@@ -2,11 +2,11 @@
 
 Create image mosaics.
 
+## Showcase
+
 *"Before and After Science" by Brian Eno*|*"Scott 3" by Scott Walker*
 -|-
 <img src="docs/bna_science_mosaic.jpg" width="100%" height="auto">|<img src="docs/scott3_mosaic.jpg" width="100%" height="auto">
-
-<!-- ![docs/scott3_mosaic.jpg](docs/scott3_mosaic.jpg?v=4&s=200)|![docs/bna_science_mosaic.jpg](docs/bna_science_mosaic.jpg?v=4&s=200) -->
 
 ## Installation
 
