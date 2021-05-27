@@ -21,18 +21,20 @@ python setup.py install
 
 ## Getting Started
 
-Required arguments include:
+Te bare minimum:
+
+```bash
+python polyfoto.py -f input.png -d sources -o output.png -n 16
+```
+
+### Required arguments
 
 - `-f` : Input file name. This is the target to recreate.
 - `-d` : Input folder name. Contains images used to recreate the target.
 - `-o` : Output file name. Name of the rendered canvas.
 - `-n` : Number of rows. How many rows of images should be used in recreation?
 
-```bash
-python polyfoto.py -f input.png -d sources -o output.png -n 16
-```
-
-## Optional arguments
+### Optional arguments
 
 - `-p` : Proportional center of construction. 0 being the top of the canvas, 1
   being the bottom.
