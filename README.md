@@ -21,7 +21,7 @@ python setup.py install
 
 ## Getting Started
 
-The bare minimum:
+Launch the program using Python; include parameters for the input file name, input folder name, output file name, and number of rows.
 
 ```bash
 python polyfoto.py -f input.png -d sources -o output.png -n 16
