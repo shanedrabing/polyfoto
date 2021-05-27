@@ -10,7 +10,7 @@ Create image mosaics.
 
 ## Installation
 
-Clone this repository to your local machine with git, then install using
+Clone this repository to your local machine with git, then install with
 Python.
 
 ```bash
@@ -21,7 +21,7 @@ python setup.py install
 
 ## Getting Started
 
-Run the program using Python.
+Run the program with Python.
 
 ```bash
 python polyfoto.py -f input.png -d sources -o output.png -n 16
