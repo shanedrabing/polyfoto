@@ -22,6 +22,15 @@ def prod(itr):
     return n
 
 
+def imread_s(filepath):
+    im = cv2.imread(filepath)
+    if im is None:
+        fmsg = "cannot read from {}".format
+        msg = fmsg(os.path.normpath(filepath))
+        raise FileNotFoundError(msg)
+    return im
+
+
 def to_bgr(im):
     if len(im.shape) == 2:
         im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
@@ -51,22 +60,34 @@ def convert_or_load(FOLDER_SRC, THUMBSIZE):
         path_tmp = os.path.realpath(os.path.join(FOLDER_TMP, name))
 
         try:
-            if os.path.exists(path_tmp):
-                im = cv2.imread(path_tmp)
-            else:
-                im = cv2.imread(path_src)
-                im = resize_landscape(im, THUMBSIZE)
-                cv2.imwrite(path_tmp, im)
+            try:
+                if os.path.exists(path_tmp):
+                    im = imread_s(path_tmp)
+                else:
+                    im = imread_s(path_src)
+                    im = resize_landscape(im, THUMBSIZE)
+                    try:
+                        cv2.imwrite(path_tmp, im)
+                    except cv2.error:
+                        # add argument for strict writing
+                        fmsg = "cannot write to {}".format
+                        msg = fmsg(os.path.normpath(path_tmp))
+                        if False:
+                            raise TypeError(msg)
+                        print("polyfoto warning: {}".format(msg))
+                        continue
 
-            if im is not None:
                 thumbs.append((name, im.astype(np.int16)))
-        except ValueError:
+            except FileNotFoundError as msg:
+                print("polyfoto warning: {}".format(msg))
+        except ValueError as e:
+            print("polyfoto warning: {}".format(e))
             pass
     return thumbs
 
 
 def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
-    cnv = to_bgr(cv2.imread(FILE_IN))
+    cnv = to_bgr(imread_s(FILE_IN))
     cnvh, cnvw, *_ = cnv.shape
     cnv = cv2.resize(cnv, (cnvw * RESCALE, cnvh * RESCALE))
     cnvh, cnvw, *_ = cnv.shape
@@ -78,6 +99,7 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
 
     len_slices = len(u)
     len_thumbs = len(thumbs)
+    thumbs_copy = thumbs.copy()
 
     for rowi, (_, (ha, hb)) in enumerate(sorted(slices, key=srt(ROW_PROP))):
         xa = 0
@@ -103,10 +125,14 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
             _, key = min(compare)
             name, im = key
             thumbs.remove(key)
+            
+            # cycle thumbnails
+            if not thumbs:
+                thumbs = thumbs_copy.copy()
 
             path_src = os.path.join(FOLDER_SRC, name)
 
-            im = cv2.imread(path_src)
+            im = imread_s(path_src)
             im = resize_landscape(im, row.shape[0])
 
             xb = xa + im.shape[1]
@@ -115,12 +141,6 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
             xa = xb
 
             print(f"{len(thumbs)} / {len_thumbs} images, {rowi} / {len_slices} rows".ljust(40), end="\r")
-
-        # cv2.imshow("Main", cv2.cvtColor(
-        #     resize_landscape(cnv, 720), cv2.COLOR_RGB2BGR))
-        # k = cv2.waitKey(1)
-        # if k == ord("q"):
-        #     sys.exit(1)
 
     print(f"{len(thumbs)} / {len_thumbs} images".ljust(40))
     return cnv
@@ -184,6 +204,9 @@ if __name__ == "__main__":
     # make folder if it doesn't exist
     if not os.path.exists(FOLDER_TMP):
         os.makedirs(FOLDER_TMP)
+
+    # check to see if FILE_IN can be loaded at all
+    imread_s(FILE_IN)
 
     # make thumbnails
     print("CONVERTING / LOADING")
