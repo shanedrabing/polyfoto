@@ -18,7 +18,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
     ],
     data_files=[
-        ("", ["LICENSE.txt"])
+        ("", ["LICENSE"])
     ],
     install_requires=[
         "cv2", "numpy"
