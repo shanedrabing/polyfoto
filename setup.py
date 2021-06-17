@@ -21,6 +21,6 @@ setuptools.setup(
         ("", ["LICENSE"])
     ],
     install_requires=[
-        "cv2", "numpy"
+        "opencv-python", "numpy"
     ]
 )
