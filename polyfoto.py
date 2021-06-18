@@ -148,6 +148,7 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
 
 if __name__ == "__main__":
     import argparse
+    import time
 
     # python mosaic_indie.py -f misc\logo.jpg -d src -o render.png -n 8
 
@@ -208,6 +209,9 @@ if __name__ == "__main__":
     # check to see if FILE_IN can be loaded at all
     imread_s(FILE_IN)
 
+    # record the start time
+    start_time = time.time()
+    
     # make thumbnails
     print("CONVERTING / LOADING")
 
@@ -226,4 +230,4 @@ if __name__ == "__main__":
     cv2.imwrite(FILE_OUT, cnv)
 
     # all done
-    print("DONE :)".ljust(30))
+    print(("DONE in %s seconds :)" % (time.time() - start_time)).ljust(30))
