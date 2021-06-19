@@ -239,4 +239,4 @@ if __name__ == "__main__":
     format_elapsed_time = time.strftime("%H:%M:%S", time.gmtime(elapsed_time*100))
 
     # all done
-    print(("DONE in %s seconds :)" % (round(elapsed_time, 2)) ).ljust(30))
+    print(("DONE in %s seconds :)" % (round(elapsed_time, 1)) ).ljust(30))
