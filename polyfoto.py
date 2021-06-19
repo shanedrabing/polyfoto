@@ -211,7 +211,7 @@ if __name__ == "__main__":
 
     # record the start time
     start_time = time.time()
-    
+
     # make thumbnails
     print("CONVERTING / LOADING")
 
@@ -229,5 +229,14 @@ if __name__ == "__main__":
 
     cv2.imwrite(FILE_OUT, cnv)
 
+    # record the end time
+    end_time = time.time()
+
+    # calculate elapsed time
+    elapsed_time = end_time - start_time
+
+    # format string for time
+    format_elapsed_time = time.strftime("%H:%M:%S", time.gmtime(elapsed_time*100))
+
     # all done
-    print(("DONE in %s seconds :)" % (time.time() - start_time)).ljust(30))
+    print(("DONE in %s seconds :)" % (round(elapsed_time, 2)) ).ljust(30))
