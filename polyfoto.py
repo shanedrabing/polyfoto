@@ -9,9 +9,9 @@ import cv2
 import numpy as np
 
 
-def srt(prop):
+def srt(prop, row_num):
     def srtf(x):
-        return abs(x[0] - ROW_NUM * prop)
+        return abs(x[0] - row_num * prop)
     return srtf
 
 
@@ -48,16 +48,16 @@ def resize_landscape(im, h):
     return reim
 
 
-def convert_or_load(FOLDER_SRC, THUMBSIZE):
+def convert_or_load(folder_src, folder_tmp, thumbsize):
     thumbs = list()
-    folder = os.listdir(FOLDER_SRC)
+    folder = os.listdir(folder_src)
     len_folder = len(folder)
     for i, name in enumerate(folder):
         if (i % 100 == 0):
             print(f"{i} / {len_folder}".ljust(30), end="\r")
 
-        path_src = os.path.realpath(os.path.join(FOLDER_SRC, name))
-        path_tmp = os.path.realpath(os.path.join(FOLDER_TMP, name))
+        path_src = os.path.realpath(os.path.join(folder_src, name))
+        path_tmp = os.path.realpath(os.path.join(folder_tmp, name))
 
         try:
             try:
@@ -65,7 +65,7 @@ def convert_or_load(FOLDER_SRC, THUMBSIZE):
                     im = imread_s(path_tmp)
                 else:
                     im = imread_s(path_src)
-                    im = resize_landscape(im, THUMBSIZE)
+                    im = resize_landscape(im, thumbsize)
                     try:
                         cv2.imwrite(path_tmp, im)
                     except cv2.error:
@@ -86,13 +86,13 @@ def convert_or_load(FOLDER_SRC, THUMBSIZE):
     return thumbs
 
 
-def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
-    cnv = to_bgr(imread_s(FILE_IN))
+def build(file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop):
+    cnv = to_bgr(imread_s(file_in))
     cnvh, cnvw, *_ = cnv.shape
-    cnv = cv2.resize(cnv, (cnvw * RESCALE, cnvh * RESCALE))
+    cnv = cv2.resize(cnv, (cnvw * rescale, cnvh * rescale))
     cnvh, cnvw, *_ = cnv.shape
 
-    rowh = cnvh / ROW_NUM
+    rowh = cnvh / row_num
     u = np.arange(0, cnvh, rowh)
     v = u + rowh
     slices = enumerate(zip(map(round, u), map(round, v)))
@@ -101,10 +101,11 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
     len_thumbs = len(thumbs)
     thumbs_copy = thumbs.copy()
 
-    for rowi, (_, (ha, hb)) in enumerate(sorted(slices, key=srt(ROW_PROP))):
+    f = srt(row_prop, row_num)
+    for rowi, (_, (ha, hb)) in enumerate(sorted(slices, key=f)):
         xa = 0
         row = cnv[ha:hb, :]
-        tmp = resize_landscape(row, THUMBSIZE)
+        tmp = resize_landscape(row, thumbsize)
         ratio = tmp.shape[1] / row.shape[1]
 
         while xa < row.shape[1]:
@@ -125,12 +126,12 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
             _, key = min(compare)
             name, im = key
             thumbs.remove(key)
-            
+
             # cycle thumbnails
             if not thumbs:
                 thumbs = thumbs_copy.copy()
 
-            path_src = os.path.join(FOLDER_SRC, name)
+            path_src = os.path.join(folder_src, name)
 
             im = imread_s(path_src)
             im = resize_landscape(im, row.shape[0])
@@ -140,7 +141,8 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
             cnv[ha:hb, xa:xb] = im[:, :prt.shape[1]]
             xa = xb
 
-            print(f"{len(thumbs)} / {len_thumbs} images, {rowi} / {len_slices} rows".ljust(40), end="\r")
+            print(f"{len(thumbs)} / {len_thumbs} images, " +
+                  f"{rowi} / {len_slices} rows".ljust(40), end="\r")
 
     print(f"{len(thumbs)} / {len_thumbs} images".ljust(40))
     return cnv
@@ -149,81 +151,50 @@ def build(FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs):
 if __name__ == "__main__":
     import argparse
 
-    # python mosaic_indie.py -f misc\logo.jpg -d src -o render.png -n 8
-
     # setup the parser
     parser = argparse.ArgumentParser()
 
+    # define arguments
+    details = (
+        ("-f", None, None, str, "Input file name"),
+        ("-d", None, None, str, "Input folder name"),
+        ("-o", None, None, str, "Output file name"),
+        ("-n", None, None, int, "Number of rows"),
+        ("-p", "?", 0.5, float, "Proportional center of construction"),
+        ("-s", "?", 4, int, "Rescaling factor"),
+        ("-t", "?", 16, int, "Pixel height of thumbnails"),
+        ("-x", "?", "tmp", str, "Output folder name for thumbnails"),
+    )
+
     # add arguments
-    parser.add_argument(
-        "-f", required=True,
-        help="Input file name", type=str
-    )
-    parser.add_argument(
-        "-d", required=True,
-        help="Input folder name", type=str
-    )
-    parser.add_argument(
-        "-o", required=True,
-        help="Output file name", type=str
-    )
-    parser.add_argument(
-        "-n", required=True,
-        help="Number of rows", type=int
-    )
-    parser.add_argument(
-        "-p", nargs="?", default=0.5,
-        help="Proportional center of construction", type=float
-    )
-    parser.add_argument(
-        "-s", nargs="?", default=4,
-        help="Rescaling factor", type=int
-    )
-    parser.add_argument(
-        "-t", nargs="?", default=16,
-        help="Pixel height of thumbnails", type=int
-    )
-    parser.add_argument(
-        "-x", nargs="?", default="tmp",
-        help="Output folder name for thumbnails", type=str
-    )
+    keys = ("nargs", "default", "type", "help")
+    for name, *values in details:
+        kwargs = dict(zip(keys, values))
+        parser.add_argument(name, **kwargs)
 
     # parse arguments
     args = parser.parse_args()
 
-    # set "constants"
-    FILE_IN = os.path.realpath(args.f)
-    FILE_OUT = os.path.realpath(args.o)
-    FOLDER_SRC = os.path.realpath(args.d)
-    FOLDER_TMP = os.path.realpath(args.x)
-    RESCALE = args.s
-    ROW_NUM = args.n
-    ROW_PROP = args.p
-    THUMBSIZE = args.t
+    # make "tmp" folder if it doesn't exist
+    if not os.path.exists(args.x):
+        os.makedirs(args.x)
 
-    # make folder if it doesn't exist
-    if not os.path.exists(FOLDER_TMP):
-        os.makedirs(FOLDER_TMP)
-
-    # check to see if FILE_IN can be loaded at all
-    imread_s(FILE_IN)
+    # check to see if file_in can be loaded at all
+    imread_s(args.f)
 
     # make thumbnails
     print("CONVERTING / LOADING")
-
-    thumbs = convert_or_load(FOLDER_SRC, THUMBSIZE)
+    thumbs = convert_or_load(args.d, args.x, args.t)
 
     # make mosaic
     print("BUILDING".ljust(30))
-
     cnv = build(
-        FILE_IN, RESCALE, ROW_NUM, ROW_PROP, FOLDER_SRC, THUMBSIZE, thumbs
+        args.f, args.d, thumbs, args.t, args.s, args.n, args.p
     )
 
     # save the canvas
     print("SAVING".ljust(30))
-
-    cv2.imwrite(FILE_OUT, cnv)
+    cv2.imwrite(args.o, cnv)
 
     # all done
     print("DONE :)".ljust(30))
