@@ -21,17 +21,17 @@ IMG_FORMATS = (
 # FUNCTIONS
 
 
-def srt(prop, row_num):
-    def srtf(x):
-        return abs(x[0] - row_num * prop)
-    return srtf
-
-
 def prod(itr):
     n = 1
     for x in itr:
         n *= x
     return n
+
+
+def sort_closure(prop, row_num):
+    def sort_closuref(x):
+        return abs(x[0] - row_num * prop)
+    return sort_closuref
 
 
 def endswith_any(string, itr):
@@ -41,7 +41,7 @@ def endswith_any(string, itr):
 def imread_s(filepath):
     im = cv2.imread(filepath)
     if im is None:
-        fmsg = "cannot read from {}".format
+        fmsg = "cannot read from path: '{}'".format
         msg = fmsg(os.path.normpath(filepath))
         raise FileNotFoundError(msg)
     return im
@@ -71,6 +71,11 @@ def convert_or_load(folder_src, folder_tmp, thumbsize):
         os.listdir(folder_src)
     ))
     len_folder = len(folder)
+
+    # raise error if no usable images
+    if (len_folder == 0):
+        raise ValueError("folder provided contains no acceptable image files.")
+
     for i, name in enumerate(folder):
         if (i % 100 == 0):
             print(f"{i} / {len_folder}".ljust(30), end="\r")
@@ -120,7 +125,7 @@ def build(file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop):
     len_thumbs = len(thumbs)
     thumbs_copy = thumbs.copy()
 
-    f = srt(row_prop, row_num)
+    f = sort_closure(row_prop, row_num)
     for rowi, (_, (ha, hb)) in enumerate(sorted(slices, key=f)):
         xa = 0
         row = cnv[ha:hb, :]
