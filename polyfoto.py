@@ -9,6 +9,18 @@ import cv2
 import numpy as np
 
 
+# CONSTANTS
+
+
+IMG_FORMATS = (
+    ".bmp", ".dib", ".jp2", ".jpe", ".jpeg", ".jpg", ".pbm",
+    ".pgm", ".png", ".ppm", ".ras", ".sr", ".tif", ".tiff",
+)
+
+
+# FUNCTIONS
+
+
 def srt(prop, row_num):
     def srtf(x):
         return abs(x[0] - row_num * prop)
@@ -20,6 +32,10 @@ def prod(itr):
     for x in itr:
         n *= x
     return n
+
+
+def endswith_any(string, itr):
+    return any(map(string.endswith, itr))
 
 
 def imread_s(filepath):
@@ -50,7 +66,10 @@ def resize_landscape(im, h):
 
 def convert_or_load(folder_src, folder_tmp, thumbsize):
     thumbs = list()
-    folder = os.listdir(folder_src)
+    folder = list(filter(
+        lambda x: endswith_any(x, IMG_FORMATS),
+        os.listdir(folder_src)
+    ))
     len_folder = len(folder)
     for i, name in enumerate(folder):
         if (i % 100 == 0):
@@ -146,6 +165,9 @@ def build(file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop):
 
     print(f"{len(thumbs)} / {len_thumbs} images".ljust(40))
     return cnv
+
+
+# SCRIPT
 
 
 if __name__ == "__main__":
