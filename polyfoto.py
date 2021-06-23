@@ -28,6 +28,10 @@ def prod(itr):
     return n
 
 
+def rint(n):
+    return int(round(n))
+
+
 def sort_closure(prop, row_num):
     def sort_closuref(x):
         return abs(x[0] - row_num * prop)
@@ -119,7 +123,7 @@ def build(file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop):
     rowh = cnvh / row_num
     u = np.arange(0, cnvh, rowh)
     v = u + rowh
-    slices = enumerate(zip(map(round, u), map(round, v)))
+    slices = enumerate(zip(map(rint, u), map(rint, v)))
 
     len_slices = len(u)
     len_thumbs = len(thumbs)
@@ -133,7 +137,7 @@ def build(file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop):
         ratio = tmp.shape[1] / row.shape[1]
 
         while xa < row.shape[1]:
-            xx = round(xa * ratio)
+            xx = rint(xa * ratio)
 
             compare = list()
             for key in thumbs:
@@ -160,7 +164,7 @@ def build(file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop):
             im = imread_s(path_src)
             im = resize_landscape(im, row.shape[0])
 
-            xb = xa + im.shape[1]
+            xb = int(xa + im.shape[1])
             prt = cnv[ha:hb, xa:xb]
             cnv[ha:hb, xa:xb] = im[:, :prt.shape[1]]
             xa = xb
