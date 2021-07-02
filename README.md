@@ -38,6 +38,8 @@ python polyfoto.py -f input.png -d sources -o output.png -n 16
 
 - `-p` : Proportional center of construction. 0 being the top of the canvas, 1
   being the bottom.
+- `-c` : Proportional chance to consume image. 1 meaning each image will be consumed on upon use, 0 meaning the image will never be consumed
+  being the bottom.
 - `-s` : Rescaling factor. Normally 4x target size.
 - `-t` : Pixel height of thumbnails. Used for the math operations, 16px height
   by default.
