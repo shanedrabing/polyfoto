@@ -72,7 +72,7 @@ def resize_landscape(im, h):
 def convert_or_load(folder_src, folder_tmp, thumbsize):
     thumbs = list()
     folder = list(filter(
-        lambda x: endswith_any(x, IMG_FORMATS),
+        lambda x: endswith_any(x.lower(), IMG_FORMATS),
         os.listdir(folder_src)
     ))
     len_folder = len(folder)
