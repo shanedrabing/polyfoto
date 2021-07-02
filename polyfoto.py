@@ -4,6 +4,7 @@ __version__ = "0.2.3"
 __email__ = "shane.drabing@gmail.com"
 
 import os
+import random
 
 import cv2
 import numpy as np
@@ -114,7 +115,9 @@ def convert_or_load(folder_src, folder_tmp, thumbsize):
     return thumbs
 
 
-def build(file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop):
+def build(
+    file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop, consume
+):
     cnv = to_bgr(imread_s(file_in))
     cnvh, cnvw, *_ = cnv.shape
     cnv = cv2.resize(cnv, (cnvw * rescale, cnvh * rescale))
@@ -153,7 +156,10 @@ def build(file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop):
 
             _, key = min(compare)
             name, im = key
-            thumbs.remove(key)
+            
+            # chance to consume
+            if random.random() < consume:
+                thumbs.remove(key)
 
             # cycle thumbnails
             if not thumbs:
@@ -192,6 +198,7 @@ if __name__ == "__main__":
         ("-o", None, None, str, "Output file name"),
         ("-n", None, None, int, "Number of rows"),
         ("-p", "?", 0.5, float, "Proportional center of construction"),
+        ("-c", "?", 1.0, float, "Proportional chance of consumption"),
         ("-s", "?", 4, int, "Rescaling factor"),
         ("-t", "?", 16, int, "Pixel height of thumbnails"),
         ("-x", "?", "tmp", str, "Output folder name for thumbnails"),
@@ -220,7 +227,7 @@ if __name__ == "__main__":
     # make mosaic
     print("BUILDING".ljust(30))
     cnv = build(
-        args.f, args.d, thumbs, args.t, args.s, args.n, args.p
+        args.f, args.d, thumbs, args.t, args.s, args.n, args.p, args.c
     )
 
     # save the canvas
