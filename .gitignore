@@ -132,3 +132,4 @@ dmypy.json
 test_script.py
 tmp
 render
+build.bat
