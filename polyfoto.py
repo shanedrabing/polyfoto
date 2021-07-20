@@ -1,6 +1,6 @@
 __author__ = "Shane Drabing"
 __license__ = "MIT"
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __email__ = "shane.drabing@gmail.com"
 
 import os
@@ -79,7 +79,7 @@ def convert_or_load(folder_src, folder_tmp, thumbsize):
 
     # raise error if no usable images
     if (len_folder == 0):
-        raise ValueError("folder provided contains no acceptable image files.")
+        raise ValueError("folder contains no image files")
 
     for i, name in enumerate(folder):
         if (i % 100 == 0):
@@ -89,38 +89,34 @@ def convert_or_load(folder_src, folder_tmp, thumbsize):
         path_tmp = os.path.realpath(os.path.join(folder_tmp, name))
 
         try:
-            try:
-                if os.path.exists(path_tmp):
-                    im = imread_s(path_tmp)
-                else:
-                    im = imread_s(path_src)
-                    im = resize_landscape(im, thumbsize)
-                    try:
-                        cv2.imwrite(path_tmp, im)
-                    except cv2.error:
-                        # add argument for strict writing
-                        fmsg = "cannot write to {}".format
-                        msg = fmsg(os.path.normpath(path_tmp))
-                        if False:
-                            raise TypeError(msg)
-                        print("polyfoto warning: {}".format(msg))
-                        continue
+            if os.path.exists(path_tmp):
+                im = imread_s(path_tmp)
+            else:
+                im = imread_s(path_src)
+                im = resize_landscape(im, thumbsize)
+                try:
+                    cv2.imwrite(path_tmp, im)
+                except cv2.error:
+                    # add argument for strict writing
+                    fmsg = "cannot write to {}".format
+                    msg = fmsg(os.path.normpath(path_tmp))
+                    if False:
+                        raise TypeError(msg)
+                    print("polyfoto warning: {}".format(msg))
+                    continue
 
-                thumbs.append((name, im.astype(np.int16)))
-            except FileNotFoundError as msg:
-                print("polyfoto warning: {}".format(msg))
+            thumbs.append((name, im.astype(np.int16)))
+        except FileNotFoundError as msg:
+            print("polyfoto warning: {}".format(msg))
         except ValueError as e:
             print("polyfoto warning: {}".format(e))
-            pass
     return thumbs
 
 
-def build(
-    file_in, folder_src, thumbs, thumbsize, rescale, row_num, row_prop, consume
-):
+def build(file_in, folder_src, thumbs, thumbsize,
+          rescale, row_num, row_prop, consume):
     cnv = to_bgr(imread_s(file_in))
-    cnvh, cnvw, *_ = cnv.shape
-    cnv = cv2.resize(cnv, (cnvw * rescale, cnvh * rescale))
+    cnv = cv2.resize(cnv, (cnv.shape[1] * rescale, cnv.shape[0] * rescale))
     cnvh, cnvw, *_ = cnv.shape
 
     rowh = cnvh / row_num
@@ -146,9 +142,7 @@ def build(
             for key in thumbs:
                 name, im = key
                 # sanity checking
-                if len(im.shape) != 3:
-                    continue
-                elif im.shape[2] != 3:
+                if len(im.shape) != 3 or im.shape[2] != 3:
                     continue
                 prt = tmp[:, xx:xx + im.shape[1]]
                 metric = sum(cv2.sumElems(abs(prt - im[:, :prt.shape[1]])))
